@@ -1,0 +1,42 @@
+import os
+import shutil
+from PIL import Image
+
+# 📂 경로 설정
+src_folder = r" "   # 원본 폴더
+dst_folder = r" "       # JPG 저장 폴더
+
+# 📁 저장 폴더가 없으면 생성
+os.makedirs(dst_folder, exist_ok=True)
+
+count_png = 0
+count_jpg = 0
+
+for filename in os.listdir(src_folder):
+    src_path = os.path.join(src_folder, filename)
+
+    # PNG → JPG 변환
+    if filename.lower().endswith('.png'):
+        new_filename = os.path.splitext(filename)[0] + ".jpg"
+        dst_path = os.path.join(dst_folder, new_filename)
+
+        try:
+            with Image.open(src_path) as img:
+                rgb_img = img.convert('RGB')
+                rgb_img.save(dst_path, 'JPEG')
+                count_png += 1
+                print(f"[PNG 변환] ✅ {new_filename}")
+        except Exception as e:
+            print(f"[PNG 오류] ❌ {filename} → {e}")
+
+    # 기존 JPG 복사
+    elif filename.lower().endswith('.jpg') or filename.lower().endswith('.jpeg'):
+        dst_path = os.path.join(dst_folder, filename)
+        try:
+            shutil.copy2(src_path, dst_path)
+            count_jpg += 1
+            print(f"[JPG 복사] ✅ {filename}")
+        except Exception as e:
+            print(f"[JPG 오류] ❌ {filename} → {e}")
+
+print(f"\n🎉 변환 완료: PNG → JPG {count_png}개, 기존 JPG 복사 {count_jpg}개")
